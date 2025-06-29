@@ -29,15 +29,14 @@ jobs:
       - name: Auto-update version on main/master
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
-          # Находим файл AssemblyInfo.cs
-          $assemblyInfoPath = Get-ChildItem -Path . -Recurse -Name "AssemblyInfo.cs" | Select-Object -First 1
-          if ($assemblyInfoPath) {
-            Write-Host "Found AssemblyInfo.cs at: $assemblyInfoPath"
+          # Находим файл проекта
+          $projectPath = "BinanceTrader\Binance Trader.csproj"
+          if (Test-Path $projectPath) {
+            Write-Host "Found project file at: $projectPath"
             
             # Читаем текущую версию
-            $content = Get-Content $assemblyInfoPath -Raw
-            $versionMatch = [regex]::Match($content, 'AssemblyVersion\("([^"]+)"\)')
-            $fileVersionMatch = [regex]::Match($content, 'AssemblyFileVersion\("([^"]+)"\)')
+            $content = Get-Content $projectPath -Raw
+            $versionMatch = [regex]::Match($content, '<Version>([^<]+)</Version>')
             
             if ($versionMatch.Success) {
               $currentVersion = $versionMatch.Groups[1].Value
@@ -58,22 +57,26 @@ jobs:
                 Write-Host "New version: $newVersion"
                 
                 # Обновляем версии в файле
-                $content = $content -replace 'AssemblyVersion\("[^"]+"\)', "AssemblyVersion(`"$newVersion`")"
-                $content = $content -replace 'AssemblyFileVersion\("[^"]+"\)', "AssemblyFileVersion(`"$newVersion`")"
+                $content = $content -replace '<Version>[^<]+</Version>', "<Version>$newVersion</Version>"
+                $content = $content -replace '<FileVersion>[^<]+</FileVersion>', "<FileVersion>$newVersion</FileVersion>"
+                $content = $content -replace '<AssemblyVersion>[^<]+</AssemblyVersion>', "<AssemblyVersion>$newVersion</AssemblyVersion>"
                 
                 # Записываем обновленный файл
-                Set-Content -Path $assemblyInfoPath -Value $content -Encoding UTF8
+                Set-Content -Path $projectPath -Value $content -Encoding UTF8
                 
                 # Коммитим изменения
-                git add $assemblyInfoPath
+                git add $projectPath
                 git commit -m "Auto-update version to $newVersion [skip ci]"
                 git push
                 
                 Write-Host "Version updated to $newVersion"
+                
+                # Сохраняем версию для создания релиза
+                echo "VERSION=$newVersion" >> $env:GITHUB_ENV
               }
             }
           } else {
-            Write-Host "AssemblyInfo.cs not found"
+            Write-Host "Project file not found"
           }
 
       - name: Restore NuGet packages
@@ -94,4 +97,30 @@ jobs:
         with:
           name: binance-trader-Release-net48
           path: binance-trader-Release-net48.zip
-          retention-days: 30 
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Binance Trader v${{ env.VERSION }}
+          body: |
+            ## Binance Trader v${{ env.VERSION }}
+            
+            ### Что нового:
+            - Автоматическая сборка и релиз
+            - Исправления ошибок компиляции
+            - Обновления API
+            
+            ### Скачать:
+            Распакуйте архив и запустите `Binance Trader.exe`
+            
+            ### Системные требования:
+            - Windows 10/11
+            - .NET Framework 4.8
+          files: binance-trader-Release-net48.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
