@@ -81,7 +81,7 @@ jobs:
 
       - name: Build solution
         run: |
-          msbuild "Binance Trader.sln" /p:Configuration=Release /p:Platform=AnyCPU /p:RestorePackages=false /verbosity:minimal
+          msbuild "Binance Trader.sln" /p:Configuration=Release /p:Platform="Any CPU" /p:RestorePackages=false /verbosity:minimal
 
       - name: Archive build output
         run: |
