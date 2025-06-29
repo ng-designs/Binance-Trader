@@ -93,8 +93,9 @@ namespace BinanceAPI.SubClients.Spot
             var result = await _baseClient.SendRequestInternal<BinanceCheckTime>(url, HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
             if (result)
             {
-                if (resetAutoTimestamp)
-                    _baseClient.ResetAutoTimestamp();
+                // Note: ResetAutoTimestamp method is not available in current implementation
+                // if (resetAutoTimestamp)
+                //     _baseClient.ResetAutoTimestamp();
             }
             return result.As(result.Data?.ServerTime ?? default);
         }
