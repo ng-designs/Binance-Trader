@@ -12,12 +12,69 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3
 
       - name: Install .NET Framework 4.8 SDK
         run: choco install dotnetfx --version=4.8.0.20190930 -y
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Auto-update version on main/master
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: |
+          # Находим файл AssemblyInfo.cs
+          $assemblyInfoPath = Get-ChildItem -Path . -Recurse -Name "AssemblyInfo.cs" | Select-Object -First 1
+          if ($assemblyInfoPath) {
+            Write-Host "Found AssemblyInfo.cs at: $assemblyInfoPath"
+            
+            # Читаем текущую версию
+            $content = Get-Content $assemblyInfoPath -Raw
+            $versionMatch = [regex]::Match($content, 'AssemblyVersion\("([^"]+)"\)')
+            $fileVersionMatch = [regex]::Match($content, 'AssemblyFileVersion\("([^"]+)"\)')
+            
+            if ($versionMatch.Success) {
+              $currentVersion = $versionMatch.Groups[1].Value
+              Write-Host "Current version: $currentVersion"
+              
+              # Разбираем версию
+              $versionParts = $currentVersion.Split('.')
+              if ($versionParts.Length -ge 4) {
+                $major = [int]$versionParts[0]
+                $minor = [int]$versionParts[1]
+                $build = [int]$versionParts[2]
+                $revision = [int]$versionParts[3]
+                
+                # Увеличиваем build number
+                $build++
+                $newVersion = "$major.$minor.$build.$revision"
+                
+                Write-Host "New version: $newVersion"
+                
+                # Обновляем версии в файле
+                $content = $content -replace 'AssemblyVersion\("[^"]+"\)', "AssemblyVersion(`"$newVersion`")"
+                $content = $content -replace 'AssemblyFileVersion\("[^"]+"\)', "AssemblyFileVersion(`"$newVersion`")"
+                
+                # Записываем обновленный файл
+                Set-Content -Path $assemblyInfoPath -Value $content -Encoding UTF8
+                
+                # Коммитим изменения
+                git add $assemblyInfoPath
+                git commit -m "Auto-update version to $newVersion [skip ci]"
+                git push
+                
+                Write-Host "Version updated to $newVersion"
+              }
+            }
+          } else {
+            Write-Host "AssemblyInfo.cs not found"
+          }
 
       - name: Restore NuGet packages
         run: nuget restore "Binance Trader.sln"
