@@ -30,9 +30,4 @@
     <!-- Common package references -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
-
-  <ItemGroup>
-    <!-- Common analyzer configuration -->
-    <EditorConfigFiles Include="$(MSBuildThisFileDirectory).editorconfig" />
-  </ItemGroup>
 </Project> 
