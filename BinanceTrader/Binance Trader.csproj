@@ -16,9 +16,9 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Version>2.8.2.4</Version>
-		<FileVersion>2.8.2.4</FileVersion>
-		<AssemblyVersion>2.8.2.4</AssemblyVersion>
+		<Version>2.8.3.4</Version>
+		<FileVersion>2.8.3.4</FileVersion>
+		<AssemblyVersion>2.8.3.4</AssemblyVersion>
 		<Authors>S Christison</Authors>
 		<Company>S Christison</Company>
 		<Copyright>S Christison ©2022</Copyright>
@@ -157,4 +157,5 @@
 		<Message Text="Copied Redistributables" Importance="High" />
 	</Target>
 </Project>
+
 
