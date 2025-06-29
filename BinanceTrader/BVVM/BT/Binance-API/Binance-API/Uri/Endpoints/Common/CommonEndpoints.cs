@@ -31,6 +31,8 @@ namespace BinanceAPI.UriBase
     public class CommonEndpoints
     {
         public const string GET_SERVER_TIME = "time";
+        public const string PING = "ping";
+        public const string EXCHANGE_INFO = "exchangeInfo";
 
         public const string API = "api";
         public const string SIGNED = "3";
@@ -38,6 +40,8 @@ namespace BinanceAPI.UriBase
         public CommonEndpoints()
         {
             API_V3_TIME_SyncTime = GetUriString.Combine(GET_SERVER_TIME, API, SIGNED);
+            API_V3_PING_Ping = GetUriString.Combine(PING, API, SIGNED);
+            API_V3_EXCHANGE_INFO_ExchangeInfo = GetUriString.Combine(EXCHANGE_INFO, API, SIGNED);
         }
 
         /// <summary>
@@ -45,5 +49,14 @@ namespace BinanceAPI.UriBase
         /// </summary>
         public readonly string API_V3_TIME_SyncTime;
 
+        /// <summary>
+        /// https://binance-docs.github.io/apidocs/spot/en/#test-connectivity
+        /// </summary>
+        public readonly string API_V3_PING_Ping;
+
+        /// <summary>
+        /// https://binance-docs.github.io/apidocs/spot/en/#exchange-information
+        /// </summary>
+        public readonly string API_V3_EXCHANGE_INFO_ExchangeInfo;
     }
 }

@@ -37,27 +37,38 @@ namespace BinanceAPI.Objects.Spot.MarketData
         /// <summary>
         /// The timezone the server uses
         /// </summary>
+        [JsonProperty("timezone")]
         public string TimeZone { get; set; } = string.Empty;
 
         /// <summary>
         /// The current server time
         /// </summary>
+        [JsonProperty("serverTime")]
         [JsonConverter(typeof(TimestampConverter))]
         public DateTime ServerTime { get; set; }
 
         /// <summary>
         /// Rate Limits
         /// </summary>
+        [JsonProperty("rateLimits")]
         public IEnumerable<BinanceRateLimit> RateLimits { get; set; } = Array.Empty<BinanceRateLimit>();
 
         /// <summary>
         /// All symbols supported
         /// </summary>
+        [JsonProperty("symbols")]
         public IEnumerable<BinanceSymbol> Symbols { get; set; } = Array.Empty<BinanceSymbol>();
 
         /// <summary>
-        /// Filters
+        /// Exchange filters
         /// </summary>
+        [JsonProperty("exchangeFilters")]
         public IEnumerable<object> ExchangeFilters { get; set; } = Array.Empty<object>();
+
+        /// <summary>
+        /// Permissions
+        /// </summary>
+        [JsonProperty("permissions")]
+        public IEnumerable<string> Permissions { get; set; } = Array.Empty<string>();
     }
 }

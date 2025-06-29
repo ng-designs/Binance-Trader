@@ -29,14 +29,15 @@ using System;
 namespace BinanceAPI.Objects.Spot.MarketData
 {
     /// <summary>
-    /// Server Time
+    /// Server time check response
     /// </summary>
     public class BinanceCheckTime
     {
         /// <summary>
-        /// Server Time
+        /// Server time
         /// </summary>
-        [JsonProperty("serverTime"), JsonConverter(typeof(TimestampConverter))]
+        [JsonProperty("serverTime")]
+        [JsonConverter(typeof(TimestampConverter))]
         public DateTime ServerTime { get; set; }
     }
 }

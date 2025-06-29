@@ -32,46 +32,56 @@ namespace BinanceAPI.Enums
         /// <summary>
         /// Order is new
         /// </summary>
-        New = 0,
+        New,
 
         /// <summary>
-        /// Order is partly filled, still has quantity left to fill
+        /// Order is partially filled
         /// </summary>
-        PartiallyFilled = 1,
+        PartiallyFilled,
 
         /// <summary>
-        /// The order has been filled and completed
+        /// Order is filled
         /// </summary>
-        Filled = 2,
+        Filled,
 
         /// <summary>
-        /// The order has been canceled
+        /// Order is canceled
         /// </summary>
-        Canceled = 3,
+        Canceled,
 
         /// <summary>
-        /// The order is in the process of being canceled  (currently unused)
+        /// Order is pending cancel
         /// </summary>
-        PendingCancel = 4,
+        PendingCancel,
 
         /// <summary>
-        /// The order has been rejected
+        /// Order is rejected
         /// </summary>
-        Rejected = 5,
+        Rejected,
 
         /// <summary>
-        /// The order has expired
+        /// Order is expired
         /// </summary>
-        Expired = 6,
+        Expired,
 
         /// <summary>
-        /// Liquidation with Insurance Fund
+        /// Order is new (insurance)
         /// </summary>
-        Insurance = 7,
+        NewInsurance,
 
         /// <summary>
-        /// Counterparty Liquidation
+        /// Order is new (adjustment)
         /// </summary>
-        Adl = 8
+        NewAdjustment,
+
+        /// <summary>
+        /// Order is expired (insurance)
+        /// </summary>
+        ExpiredInsurance,
+
+        /// <summary>
+        /// Order is expired (adjustment)
+        /// </summary>
+        ExpiredAdjustment
     }
 }

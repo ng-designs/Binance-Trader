@@ -30,63 +30,58 @@ namespace BinanceAPI.Enums
     public enum OrderType
     {
         /// <summary>
-        /// Limit orders will be placed at a specific price. If the price isn't available in the order book for that asset the order will be added in the order book for someone to fill.
+        /// Limit order
         /// </summary>
-        Limit = 0,
+        Limit,
 
         /// <summary>
-        /// Market order will be placed without a price. The order will be executed at the best price available at that time in the order book.
+        /// Market order
         /// </summary>
-        Market = 1,
+        Market,
 
         /// <summary>
-        /// Stop loss order. Will execute a market order when the price drops below a price to sell and therefor limit the loss
+        /// Stop loss order
         /// </summary>
-        StopLoss = 2,
+        StopLoss,
 
         /// <summary>
-        /// Stop loss order. Will execute a limit order when the price drops below a price to sell and therefor limit the loss
+        /// Stop loss limit order
         /// </summary>
-        StopLossLimit = 3,
+        StopLossLimit,
 
         /// <summary>
-        /// Stop loss order. Will execute a market order when the price drops below a price to sell and therefor limit the loss
+        /// Take profit order
         /// </summary>
-        Stop = 4,
+        TakeProfit,
 
         /// <summary>
-        /// Stop loss order. Will be executed at the best price available at that time in the order book
+        /// Take profit limit order
         /// </summary>
-        StopMarket = 5,
+        TakeProfitLimit,
 
         /// <summary>
-        /// Take profit order. Will execute a market order when the price rises above a price to sell and therefor take a profit
+        /// Limit maker order
         /// </summary>
-        TakeProfit = 6,
+        LimitMaker,
 
         /// <summary>
-        /// Take profit order. Will be executed at the best price available at that time in the order book
+        /// Stop market order
         /// </summary>
-        TakeProfitMarket = 7,
+        StopMarket,
 
         /// <summary>
-        /// Take profit order. Will execute a limit order when the price rises above a price to sell and therefor take a profit
+        /// Take profit market order
         /// </summary>
-        TakeProfitLimit = 8,
+        TakeProfitMarket,
 
         /// <summary>
-        /// Same as a limit order, however it will fail if the order would immediately match, therefor preventing taker orders
+        /// Trailing stop market order
         /// </summary>
-        LimitMaker = 9,
+        TrailingStopMarket,
 
         /// <summary>
-        /// Trailing stop order will be placed without a price. The order will be executed at the best price available at that time in the order book.
+        /// One cancels other order
         /// </summary>
-        TrailingStopMarket = 10,
-
-        /// <summary>
-        ///
-        /// </summary>
-        Liquidation = 11
+        Oco
     }
 }

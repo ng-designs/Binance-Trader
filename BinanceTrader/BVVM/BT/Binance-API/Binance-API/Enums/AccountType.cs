@@ -25,78 +25,48 @@
 namespace BinanceAPI.Enums
 {
     /// <summary>
-    /// Type of account
+    /// The type of an account
     /// </summary>
     public enum AccountType
     {
         /// <summary>
-        /// Unknown account type
-        /// </summary>
-        Unknown,
-
-        /// <summary>
-        /// Spot account type
+        /// Spot account
         /// </summary>
         Spot,
 
         /// <summary>
-        /// Margin account type
-        /// </summary>>
+        /// Margin account
+        /// </summary>
         Margin,
 
         /// <summary>
-        /// Futures account type
+        /// Futures account
         /// </summary>
         Futures,
 
         /// <summary>
-        /// Leveraged account type
+        /// Options account
         /// </summary>
-        Leveraged,
+        Options,
 
         /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
+        /// Isolated margin account
         /// </summary>
-        TRD_GRP_002,
+        IsolatedMargin,
 
         /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
+        /// Unified account
         /// </summary>
-        TRD_GRP_003,
+        Unified,
 
         /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
+        /// Funding account
         /// </summary>
-        TRD_GRP_004,
+        Funding,
 
         /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
+        /// Portfolio margin account
         /// </summary>
-        TRD_GRP_005,
-
-        /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
-        /// </summary>
-        TRD_GRP_006,
-
-        /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
-        /// </summary>
-        TRD_GRP_007,
-
-        /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
-        /// </summary>
-        TRD_GRP_008,
-
-        /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
-        /// </summary>
-        TRD_GRP_009,
-
-        /// <summary>
-        /// See https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md#enum-definitions
-        /// </summary>
-        TRD_GRP_010,
+        PortfolioMargin
     }
 }

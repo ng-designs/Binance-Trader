@@ -45,22 +45,26 @@ namespace BinanceAPI.Objects.Spot.MarketData
         /// <summary>
         /// The status of the symbol
         /// </summary>
+        [JsonProperty("status")]
         [JsonConverter(typeof(SymbolStatusConverter))]
         public SymbolStatus Status { get; set; }
 
         /// <summary>
         /// The base asset
         /// </summary>
+        [JsonProperty("baseAsset")]
         public string BaseAsset { get; set; } = string.Empty;
 
         /// <summary>
         /// The precision of the base asset
         /// </summary>
+        [JsonProperty("baseAssetPrecision")]
         public int BaseAssetPrecision { get; set; }
 
         /// <summary>
         /// The quote asset
         /// </summary>
+        [JsonProperty("quoteAsset")]
         public string QuoteAsset { get; set; } = string.Empty;
 
         /// <summary>
@@ -72,27 +76,32 @@ namespace BinanceAPI.Objects.Spot.MarketData
         /// <summary>
         /// Allowed order types
         /// </summary>
-        [JsonProperty(ItemConverterType = typeof(OrderTypeConverter))]
+        [JsonProperty("orderTypes")]
+        [JsonConverter(typeof(OrderTypeConverter))]
         public IEnumerable<OrderType> OrderTypes { get; set; } = Array.Empty<OrderType>();
 
         /// <summary>
         /// Ice berg orders allowed
         /// </summary>
+        [JsonProperty("icebergAllowed")]
         public bool IceBergAllowed { get; set; }
 
         /// <summary>
         /// Spot trading orders allowed
         /// </summary>
+        [JsonProperty("isSpotTradingAllowed")]
         public bool IsSpotTradingAllowed { get; set; }
 
         /// <summary>
         /// Margin trading orders allowed
         /// </summary>
+        [JsonProperty("isMarginTradingAllowed")]
         public bool IsMarginTradingAllowed { get; set; }
 
         /// <summary>
         /// If OCO(One Cancels Other) orders are allowed
         /// </summary>
+        [JsonProperty("ocoAllowed")]
         public bool OCOAllowed { get; set; }
 
         /// <summary>
@@ -104,32 +113,38 @@ namespace BinanceAPI.Objects.Spot.MarketData
         /// <summary>
         /// The precision of the base asset commission
         /// </summary>
+        [JsonProperty("baseCommissionPrecision")]
         public int BaseCommissionPrecision { get; set; }
 
         /// <summary>
         /// The precision of the quote asset commission
         /// </summary>
+        [JsonProperty("quoteCommissionPrecision")]
         public int QuoteCommissionPrecision { get; set; }
 
         /// <summary>
         /// True if the symbol allows trailing stops
         /// </summary>
+        [JsonProperty("allowTrailingStop")]
         public bool AllowTrailingStop { get; set; }
 
         /// <summary>
         /// True if the symbol allows Cancel Replace
         /// </summary>
+        [JsonProperty("cancelReplaceAllowed")]
         public bool CancelReplaceAllowed { get; set; }
 
         /// <summary>
         /// Permissions types
         /// </summary>
-        [JsonProperty(ItemConverterType = typeof(AccountTypeConverter))]
+        [JsonProperty("permissions")]
+        [JsonConverter(typeof(AccountTypeConverter))]
         public IEnumerable<AccountType> Permissions { get; set; } = Array.Empty<AccountType>();
 
         /// <summary>
         /// Filters for order on this symbol
         /// </summary>
+        [JsonProperty("filters")]
         public IEnumerable<BinanceSymbolFilter> Filters { get; set; } = Array.Empty<BinanceSymbolFilter>();
 
         /// <summary>

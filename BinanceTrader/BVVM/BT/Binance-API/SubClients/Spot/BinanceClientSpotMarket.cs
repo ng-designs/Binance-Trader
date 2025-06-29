@@ -31,6 +31,7 @@ using BinanceAPI.Objects.Spot.MarketStream;
 using BinanceAPI.Objects.Spot.WalletData;
 using BinanceAPI.Requests;
 using BinanceAPI.Time;
+using BinanceAPI.UriBase;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -78,9 +79,12 @@ namespace BinanceAPI.SubClients.Spot
         /// <returns>The order book for the symbol</returns>
         public async Task<WebCallResult<BinanceOrderBook>> GetOrderBookAsync(string symbol, int? limit = null, CancellationToken ct = default)
         {
-            limit?.ValidateIntValues(nameof(limit), 5, 10, 20, 50, 100, 500, 1000, 5000);
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
             parameters.AddOptionalParameter("limit", limit?.ToString(CultureInfo.InvariantCulture));
+
             var result = await _baseClient.SendRequestInternal<BinanceOrderBook>(UriClient.GetBaseAddress() + GetUriString.Combine(orderBookEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
             if (result)
                 result.Data.Symbol = symbol;
@@ -89,7 +93,7 @@ namespace BinanceAPI.SubClients.Spot
 
         #endregion Order Book
 
-        #region Recent Trades List
+        #region Recent trades
 
         /// <summary>
         /// Gets the recent trades for a symbol
@@ -97,43 +101,45 @@ namespace BinanceAPI.SubClients.Spot
         /// <param name="symbol">The symbol to get recent trades for</param>
         /// <param name="limit">Result limit</param>
         /// <param name="ct">Cancellation token</param>
-        /// <returns>List of recent trades</returns>
-        public async Task<WebCallResult<IEnumerable<BinanceRecentTrade>>> GetRecentTradeHistoryAsync(string symbol, int? limit = null, CancellationToken ct = default)
+        /// <returns>Recent trades</returns>
+        public async Task<WebCallResult<IEnumerable<BinanceRecentTrade>>> GetRecentTradesAsync(string symbol, int? limit = null, CancellationToken ct = default)
         {
-            limit?.ValidateIntBetween(nameof(limit), 1, 1000);
-
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
             parameters.AddOptionalParameter("limit", limit?.ToString(CultureInfo.InvariantCulture));
-            var result = await _baseClient.SendRequestInternal<IEnumerable<BinanceRecentTradeQuote>>(UriClient.GetBaseAddress() + GetUriString.Combine(recentTradesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
-            return result.As<IEnumerable<BinanceRecentTrade>>(result.Data);
+
+            return await _baseClient.SendRequestInternal<IEnumerable<BinanceRecentTrade>>(UriClient.GetBaseAddress() + GetUriString.Combine(recentTradesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
         }
 
-        #endregion Recent Trades List
+        #endregion Recent trades
 
-        #region Old Trade Lookup
+        #region Historical trades
 
         /// <summary>
-        /// Gets the historical  trades for a symbol
+        /// Gets the historical trades for a symbol
         /// </summary>
         /// <param name="symbol">The symbol to get recent trades for</param>
         /// <param name="limit">Result limit</param>
         /// <param name="fromId">From which trade id on results should be retrieved</param>
         /// <param name="ct">Cancellation token</param>
-        /// <returns>List of recent trades</returns>
-        public async Task<WebCallResult<IEnumerable<BinanceRecentTrade>>> GetTradeHistoryAsync(string symbol, int? limit = null, long? fromId = null, CancellationToken ct = default)
+        /// <returns>Historical trades</returns>
+        public async Task<WebCallResult<IEnumerable<BinanceRecentTrade>>> GetHistoricalTradesAsync(string symbol, int? limit = null, long? fromId = null, CancellationToken ct = default)
         {
-            limit?.ValidateIntBetween(nameof(limit), 1, 1000);
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
             parameters.AddOptionalParameter("limit", limit?.ToString(CultureInfo.InvariantCulture));
             parameters.AddOptionalParameter("fromId", fromId?.ToString(CultureInfo.InvariantCulture));
 
-            var result = await _baseClient.SendRequestInternal<IEnumerable<BinanceRecentTradeQuote>>(UriClient.GetBaseAddress() + GetUriString.Combine(historicalTradesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
-            return result.As<IEnumerable<BinanceRecentTrade>>(result.Data);
+            return await _baseClient.SendRequestInternal<IEnumerable<BinanceRecentTrade>>(UriClient.GetBaseAddress() + GetUriString.Combine(historicalTradesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
         }
 
-        #endregion Old Trade Lookup
+        #endregion Historical trades
 
-        #region Compressed/Aggregate Trades List
+        #region Aggregated trades
 
         /// <summary>
         /// Gets compressed, aggregate trades. Trades that fill at the time, from the same order, with the same price will have the quantity aggregated.
@@ -144,26 +150,27 @@ namespace BinanceAPI.SubClients.Spot
         /// <param name="endTime">Time to stop getting trades from</param>
         /// <param name="limit">Max number of results</param>
         /// <param name="ct">Cancellation token</param>
-        /// <returns>The aggregated trades list for the symbol</returns>
-        public async Task<WebCallResult<IEnumerable<BinanceAggregatedTrade>>> GetAggregatedTradeHistoryAsync(string symbol, long? fromId = null, DateTime? startTime = null, DateTime? endTime = null, int? limit = null, CancellationToken ct = default)
+        /// <returns>The aggregated trades list</returns>
+        public async Task<WebCallResult<IEnumerable<BinanceAggregatedTrade>>> GetAggregatedTradesAsync(string symbol, long? fromId = null, DateTime? startTime = null, DateTime? endTime = null, int? limit = null, CancellationToken ct = default)
         {
-            limit?.ValidateIntBetween(nameof(limit), 1, 1000);
-
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
             parameters.AddOptionalParameter("fromId", fromId?.ToString(CultureInfo.InvariantCulture));
-            parameters.AddOptionalParameter("startTime", startTime != null ? TimeHelper.ToUnixTimestamp(startTime.Value.Ticks).ToString(CultureInfo.InvariantCulture) : null);
-            parameters.AddOptionalParameter("endTime", endTime != null ? TimeHelper.ToUnixTimestamp(endTime.Value.Ticks).ToString(CultureInfo.InvariantCulture) : null);
+            parameters.AddOptionalParameter("startTime", startTime?.ToString(CultureInfo.InvariantCulture));
+            parameters.AddOptionalParameter("endTime", endTime?.ToString(CultureInfo.InvariantCulture));
             parameters.AddOptionalParameter("limit", limit?.ToString(CultureInfo.InvariantCulture));
 
             return await _baseClient.SendRequestInternal<IEnumerable<BinanceAggregatedTrade>>(UriClient.GetBaseAddress() + GetUriString.Combine(aggregatedTradesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
         }
 
-        #endregion Compressed/Aggregate Trades List
+        #endregion Aggregated trades
 
-        #region Kline/Candlestick Data
+        #region Kline/Candlestick data
 
         /// <summary>
-        /// Get candlestick data for the provided symbol
+        /// Gets the candlestick data for the provided symbol
         /// </summary>
         /// <param name="symbol">The symbol to get the data for</param>
         /// <param name="interval">The candlestick timespan</param>
@@ -174,76 +181,60 @@ namespace BinanceAPI.SubClients.Spot
         /// <returns>The candlestick data for the provided symbol</returns>
         public async Task<WebCallResult<IEnumerable<BinanceSpotKline>>> GetKlinesAsync(string symbol, KlineInterval interval, DateTime? startTime = null, DateTime? endTime = null, int? limit = null, CancellationToken ct = default)
         {
-            limit?.ValidateIntBetween(nameof(limit), 1, 1500);
-            var parameters = new Dictionary<string, object> {
+            var parameters = new Dictionary<string, object>
+            {
                 { "symbol", symbol },
                 { "interval", JsonConvert.SerializeObject(interval, new KlineIntervalConverter(false)) }
             };
-            parameters.AddOptionalParameter("startTime", startTime != null ? TimeHelper.ToUnixTimestamp(startTime.Value.Ticks).ToString(CultureInfo.InvariantCulture) : null);
-            parameters.AddOptionalParameter("endTime", endTime != null ? TimeHelper.ToUnixTimestamp(endTime.Value.Ticks).ToString(CultureInfo.InvariantCulture) : null);
+            parameters.AddOptionalParameter("startTime", startTime?.ToString(CultureInfo.InvariantCulture));
+            parameters.AddOptionalParameter("endTime", endTime?.ToString(CultureInfo.InvariantCulture));
             parameters.AddOptionalParameter("limit", limit?.ToString(CultureInfo.InvariantCulture));
 
-            var result = await _baseClient.SendRequestInternal<IEnumerable<BinanceSpotKline>>(UriClient.GetBaseAddress() + GetUriString.Combine(klinesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
-            return result.As<IEnumerable<BinanceSpotKline>>(result.Data);
+            var result = await _baseClient.SendRequestInternal<IEnumerable<object[]>>(UriClient.GetBaseAddress() + GetUriString.Combine(klinesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
+            return result.As(result.Data?.Select(item => new BinanceSpotKline(item)) ?? Array.Empty<BinanceSpotKline>());
         }
 
-        #endregion Kline/Candlestick Data
+        #endregion Kline/Candlestick data
 
-        #region Current Average Price
+        #region 24hr ticker
 
         /// <summary>
-        /// Gets current average price for a symbol
+        /// Gets the 24hr ticker for the provided symbol
         /// </summary>
-        /// <param name="symbol">The symbol to get the data for</param>
+        /// <param name="symbol">The symbol to get the ticker for</param>
         /// <param name="ct">Cancellation token</param>
-        /// <returns></returns>
-        public async Task<WebCallResult<BinanceAveragePrice>> GetCurrentAvgPriceAsync(string symbol, CancellationToken ct = default)
+        /// <returns>The 24hr ticker for the symbol</returns>
+        public async Task<WebCallResult<Binance24HPrice>> GetTicker24HAsync(string symbol, CancellationToken ct = default)
         {
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
 
-            return await _baseClient.SendRequestInternal<BinanceAveragePrice>(UriClient.GetBaseAddress() + GetUriString.Combine(averagePriceEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
-        }
-
-        #endregion Current Average Price
-
-        #region 24hr Ticker Price Change Statistics
-
-        /// <summary>
-        /// Get data regarding the last 24 hours for the provided symbol
-        /// </summary>
-        /// <param name="symbol">The symbol to get the data for</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Data over the last 24 hours</returns>
-        public async Task<WebCallResult<BinanceStreamTick>> GetTickerAsync(string symbol, CancellationToken ct = default)
-        {
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
-
-            var result = await _baseClient.SendRequestInternal<BinanceStreamTick>(UriClient.GetBaseAddress() + GetUriString.Combine(price24HEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
-            return result.As<BinanceStreamTick>(result.Data);
+            return await _baseClient.SendRequestInternal<Binance24HPrice>(UriClient.GetBaseAddress() + GetUriString.Combine(price24HEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Get data regarding the last 24 hours for all symbols
+        /// Gets the 24hr ticker for all symbols
         /// </summary>
         /// <param name="ct">Cancellation token</param>
-        /// <returns>List of data over the last 24 hours</returns>
-        public async Task<WebCallResult<IEnumerable<BinanceStreamTick>>> GetTickersAsync(CancellationToken ct = default)
+        /// <returns>24hr ticker for all symbols</returns>
+        public async Task<WebCallResult<IEnumerable<Binance24HPrice>>> GetTickers24HAsync(CancellationToken ct = default)
         {
-            var result = await _baseClient.SendRequestInternal<IEnumerable<BinanceStreamTick>>(UriClient.GetBaseAddress() + GetUriString.Combine(price24HEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
-            return result.As<IEnumerable<BinanceStreamTick>>(result.Data);
+            return await _baseClient.SendRequestInternal<IEnumerable<Binance24HPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(price24HEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
         }
 
-        #endregion 24hr Ticker Price Change Statistics
+        #endregion 24hr ticker
 
-        #region Symbol Price Ticker
+        #region Symbol price ticker
 
         /// <summary>
-        /// Gets the price of a symbol
+        /// Gets the price for a symbol
         /// </summary>
-        /// <param name="symbol">The symbol to get the price for</param>
+        /// <param name="symbol">The symbol to get price for</param>
         /// <param name="ct">Cancellation token</param>
         /// <returns>Price of symbol</returns>
-        public async Task<WebCallResult<BinancePrice>> GetPriceAsync(string symbol, CancellationToken ct = default)
+        public async Task<WebCallResult<BinancePrice>> GetTickerPriceAsync(string symbol, CancellationToken ct = default)
         {
             var parameters = new Dictionary<string, object>
             {
@@ -254,28 +245,31 @@ namespace BinanceAPI.SubClients.Spot
         }
 
         /// <summary>
-        /// Get a list of the prices of all symbols
+        /// Gets the price for all symbols
         /// </summary>
         /// <param name="ct">Cancellation token</param>
         /// <returns>List of prices</returns>
-        public async Task<WebCallResult<IEnumerable<BinancePrice>>> GetPricesAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<BinancePrice>>> GetTickerPricesAsync(CancellationToken ct = default)
         {
-            return await _baseClient.SendRequestInternal<IEnumerable<BinancePrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(allPricesEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
+            return await _baseClient.SendRequestInternal<IEnumerable<BinancePrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(allPricesEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
         }
 
-        #endregion Symbol Price Ticker
+        #endregion Symbol price ticker
 
-        #region Symbol Order Book Ticker
+        #region Symbol order book ticker
 
         /// <summary>
         /// Gets the best price/quantity on the order book for a symbol.
         /// </summary>
         /// <param name="symbol">Symbol to get book price for</param>
         /// <param name="ct">Cancellation token</param>
-        /// <returns>List of book prices</returns>
-        public async Task<WebCallResult<BinanceBookPrice>> GetBookPriceAsync(string symbol, CancellationToken ct = default)
+        /// <returns>Book price</returns>
+        public async Task<WebCallResult<BinanceBookPrice>> GetTickerBookPriceAsync(string symbol, CancellationToken ct = default)
         {
-            var parameters = new Dictionary<string, object> { { "symbol", symbol } };
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
 
             return await _baseClient.SendRequestInternal<BinanceBookPrice>(UriClient.GetBaseAddress() + GetUriString.Combine(bookPricesEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
         }
@@ -285,12 +279,32 @@ namespace BinanceAPI.SubClients.Spot
         /// </summary>
         /// <param name="ct">Cancellation token</param>
         /// <returns>List of book prices</returns>
-        public async Task<WebCallResult<IEnumerable<BinanceBookPrice>>> GetAllBookPricesAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<BinanceBookPrice>>> GetTickerBookPricesAsync(CancellationToken ct = default)
         {
-            return await _baseClient.SendRequestInternal<IEnumerable<BinanceBookPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(bookPricesEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
+            return await _baseClient.SendRequestInternal<IEnumerable<BinanceBookPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(bookPricesEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
         }
 
-        #endregion Symbol Order Book Ticker
+        #endregion Symbol order book ticker
+
+        #region Average price
+
+        /// <summary>
+        /// Gets the average price for a symbol
+        /// </summary>
+        /// <param name="symbol">The symbol to get the data for</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Average price</returns>
+        public async Task<WebCallResult<BinanceAveragePrice>> GetCurrentAvgPriceAsync(string symbol, CancellationToken ct = default)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { "symbol", symbol }
+            };
+
+            return await _baseClient.SendRequestInternal<BinanceAveragePrice>(UriClient.GetBaseAddress() + GetUriString.Combine(averagePriceEndpoint, api, publicVersion), HttpMethod.Get, ct, parameters).ConfigureAwait(false);
+        }
+
+        #endregion Average price
 
         #region GetTradeFee
 
