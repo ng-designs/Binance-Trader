@@ -85,13 +85,13 @@ jobs:
 
       - name: Archive build output
         run: |
-          $buildPath = "BinanceTrader\bin\Release\x64"
-          $artifactName = "binance-trader-Release-x64.zip"
+          $buildPath = "BinanceTrader\bin\Release\net48"
+          $artifactName = "binance-trader-Release-net48.zip"
           Compress-Archive -Path "$buildPath\*" -DestinationPath "$artifactName" -Force
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: binance-trader-Release-x64
-          path: binance-trader-Release-x64.zip
+          name: binance-trader-Release-net48
+          path: binance-trader-Release-net48.zip
           retention-days: 30 
