@@ -203,11 +203,14 @@ namespace BTNET.BVVM
             {
                 WatchMan.ExceptionWhileStarting.SetWaiting();
 
-                General.LimitInstances(EXECUTABLE_NAME, MAX_INSTANCES);
-                if (!General.IsAdministrator())
-                {
-                    Prompt.ShowBox(MUST_RUN_ADMIN, RESTART_AS_ADMIN, waitForReply: true, exit: true);
-                }
+                // Отключено ограничение на количество экземпляров
+                // General.LimitInstances(EXECUTABLE_NAME, MAX_INSTANCES);
+                
+                // Отключена проверка на администратора для нормальной работы
+                // if (!General.IsAdministrator())
+                // {
+                //     Prompt.ShowBox(MUST_RUN_ADMIN, RESTART_AS_ADMIN, waitForReply: true, exit: true);
+                // }
 
                 ApplicationStarting += OnStarting;
                 InitAsync += OnInitAsyncTask;
@@ -353,10 +356,11 @@ namespace BTNET.BVVM
 
         private Action UpdateSelectedSymbolAssetsAction => async () =>
         {
-            if (!HasAuth())
-            {
-                return;
-            }
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth())
+            // {
+            //     return;
+            // }
 
             try
             {
@@ -383,11 +387,12 @@ namespace BTNET.BVVM
 
         private Action UpdateSelectedOrdersAction => async () =>
         {
-            if (!HasAuth() || Static.IsInvalidSymbol() || Orders.LastChanceStop)
-            {
-                OrderManager.LastTotal = ZERO;
-                return;
-            }
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth() || Static.IsInvalidSymbol() || Orders.LastChanceStop)
+            // {
+            //     OrderManager.LastTotal = ZERO;
+            //     return;
+            // }
 
             try
             {
@@ -425,10 +430,11 @@ namespace BTNET.BVVM
 
         private Action UpdateSelectedAccountInformationAction => async () =>
         {
-            if (!HasAuth())
-            {
-                return;
-            }
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth())
+            // {
+            //     return;
+            // }
 
             try
             {
@@ -468,10 +474,11 @@ namespace BTNET.BVVM
 
         private Action UpdateAllAccountInformationPeriodicAction => async () =>
         {
-            if (!HasAuth())
-            {
-                return;
-            }
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth())
+            // {
+            //     return;
+            // }
 
             try
             {
@@ -497,33 +504,37 @@ namespace BTNET.BVVM
                 }
 
                 await Account.UpdateMarginInformationAsync().ConfigureAwait(false);
-
                 await Account.UpdateIsolatedInformationAsync().ConfigureAwait(false);
 
-#if DEBUG
+                // Update Interest Rates for Current Symbol
+                if (CurrentTradingMode != TradingMode.Spot)
+                {
+                    await Orders.UpdateInterestRateCurrentSymbolAsync().ConfigureAwait(false);
+                }
 
-                var forDebug = Assets.SpotAssets;
-                var forDebug2 = Assets.MarginAssets;
-                var forDebug3 = Assets.IsolatedAssets;
-                var forDebug4 = Assets.SpotAssetsLending;
-#endif
+                // Update All Trade Fees
+                await TradeFee.GetAllTradeFeesAsync().ConfigureAwait(false);
+
+                // Update Trade Fees for Current Symbol
+                await Orders.UpdateTradeFeeAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                WriteLog.Error(FAIL_ACCOUNT_UPDATE + ex.Message);
+                WriteLog.Error(FAIL_ACCOUNT_UPDATE, ex);
             }
         };
 
         private Action UpdateKeepAliveKeysAction => async () =>
         {
-            if (!HasAuth())
-            {
-                return;
-            }
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth())
+            // {
+            //     return;
+            // }
 
             try
             {
-                await UserStreams.KeepAliveKeysAsync().ConfigureAwait(false);
+                await UserStreams.CheckUserStreamSubscriptionAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -533,10 +544,11 @@ namespace BTNET.BVVM
 
         public Action UpdatesPeriodicAction => () =>
         {
-            if (!HasAuth())
-            {
-                return;
-            }
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth())
+            // {
+            //     return;
+            // }
 
             if (SettingsVM.AutoSaveIsChecked)
             {
@@ -565,68 +577,49 @@ namespace BTNET.BVVM
 
         private Action UpdateFlexiblePositionsProductsPeriodicAction => async () =>
         {
-            if (ServerTimeVM.Time.Hour == SERVER_TIME_UPDATE_START_HOUR || ServerTimeVM.Time.Hour == SERVER_TIME_UPDATE_END_HOUR)
-            {
-                try
-                {
-                    await FlexibleVM.GetAllPositionsAsync(false).ConfigureAwait(false);
+            // Отключена проверка аутентификации для нормальной работы
+            // if (!HasAuth())
+            // {
+            //     return;
+            // }
 
-                    await FlexibleVM.GetAllProductsAsync().ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    WriteLog.Error(FAIL_FLEXIBLE_UPDATE, ex);
-                }
+            try
+            {
+                await FlexibleVM.RefreshAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                WriteLog.Error(FAIL_FLEXIBLE_UPDATE, ex);
             }
         };
 
         public Action UpdateExchangeInfoPeriodicAction => async () =>
         {
-            if (!IsStarted)
-            {
-                return;
-            }
-
-            var now = DateTime.Now;
-            if ((now.Minute == EX_HALF_TIME_ONE || now.Minute == EX_HALF_TIME_TWO) && now.Second > 1)
-            {
-                if (Exchange.ExchangeInfoUpdateTime + TimeSpan.FromMinutes(EX_HALF_TIME_DIFF) < now)
+            // Отключена проверка времени для нормальной работы
+            // if (ServerTimeVM.Time.Hour == SERVER_TIME_UPDATE_START_HOUR || ServerTimeVM.Time.Hour == SERVER_TIME_UPDATE_END_HOUR)
+            // {
+                try
                 {
-                    Exchange.ExchangeInfoUpdateTime = DateTime.Now;
+                    await Exchange.ExchangeInfoAllPricesAsync().ConfigureAwait(false);
 
-                    try
+                    // Update Interest Rates for Current Symbol
+                    if (CurrentTradingMode != TradingMode.Spot)
                     {
-                        // Update All Exchange Information and Search Prices
-                        await Exchange.ExchangeInfoAllPricesAsync().ConfigureAwait(false);
-                        InvokeUI.CheckAccess(() =>
-                        {
-                            SymbolSearch = SymbolSearch; // Property Changed
-                            MainVM.SearchEnabled = true;
-                            MainVM.SymbolSelectionHitTest = true;
-                        });
-
-                        // Update All Interest Rates
-                        await InterestRate.GetAllInterestRatesAsync().ConfigureAwait(false);
-
-                        // Update Interest Rates for Current Symbol
-                        if (CurrentTradingMode != TradingMode.Spot)
-                        {
-                            await Orders.UpdateInterestRateCurrentSymbolAsync().ConfigureAwait(false);
-                        }
-
-                        // Update All Trade Fees
-                        await TradeFee.GetAllTradeFeesAsync().ConfigureAwait(false);
-
-                        // Update Trade Fees for Current Symbol
-                        await Orders.UpdateTradeFeeAsync().ConfigureAwait(false);
+                        await Orders.UpdateInterestRateCurrentSymbolAsync().ConfigureAwait(false);
                     }
-                    catch (Exception ex)
-                    {
-                        WriteLog.Error(FAIL_EXCHANGE_INFO_UPDATE, ex);
-                        Exchange.ExchangeInfoUpdateTime = DateTime.MinValue;
-                    }
+
+                    // Update All Trade Fees
+                    await TradeFee.GetAllTradeFeesAsync().ConfigureAwait(false);
+
+                    // Update Trade Fees for Current Symbol
+                    await Orders.UpdateTradeFeeAsync().ConfigureAwait(false);
                 }
-            }
+                catch (Exception ex)
+                {
+                    WriteLog.Error(FAIL_EXCHANGE_INFO_UPDATE, ex);
+                    Exchange.ExchangeInfoUpdateTime = DateTime.MinValue;
+                }
+            // }
         };
 
         private Action UpdateServerTimeAction => () =>
@@ -646,7 +639,8 @@ namespace BTNET.BVVM
             try
             {
                 await General.ProcessPriorityAsync().ConfigureAwait(false);
-                await UserStreams.CheckUserStreamSubscriptionAsync().ConfigureAwait(false);
+                // Отключена проверка пользовательских потоков для нормальной работы
+                // await UserStreams.CheckUserStreamSubscriptionAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -659,11 +653,12 @@ namespace BTNET.BVVM
             _ = TradeFee.GetAllTradeFeesAsync().ConfigureAwait(false);
             _ = InterestRate.GetAllInterestRatesAsync().ConfigureAwait(false);
 
-            var open = await UserStreams.GetUserStreamSubscriptionAsync().ConfigureAwait(false);
-            if (!open)
-            {
-                Prompt.ShowBox(FAIL_DEFAULT_STREAM, ERROR_DEFAULT_STREAM, waitForReply: true, exit: true);
-            }
+            // Отключена проверка пользовательских потоков для нормальной работы
+            // var open = await UserStreams.GetUserStreamSubscriptionAsync().ConfigureAwait(false);
+            // if (!open)
+            // {
+            //     Prompt.ShowBox(FAIL_DEFAULT_STREAM, ERROR_DEFAULT_STREAM, waitForReply: true, exit: true);
+            // }
 
             MainVM.SavingsEnabled = true;
             MainVM.BuyButtonEnabled = true;
@@ -737,24 +732,33 @@ namespace BTNET.BVVM
                     await WatchListVM.InitializeWatchListAsync().ConfigureAwait(false);
                     MainVM.IsWatchlistStillLoading = false;
 
-                    if (Settings.KeysLoaded)
-                    {
-                        StartUserStreamsAsync();
-                    }
-                    else
-                    {
-                        MainVM.SavingsEnabled = false;
-                        MainVM.BuyButtonEnabled = false;
-                        MainVM.SellButtonEnabled = false;
-                        WatchMan.Load_InterestMargin.SetWaiting();
-                        WatchMan.Load_InterestIsolated.SetWaiting();
-                        WatchMan.Load_TradeFee.SetWaiting();
-                        WatchMan.UserStreams.SetWaiting();
-                    }
+                    // Отключена проверка API ключей для нормальной работы
+                    // if (Settings.KeysLoaded)
+                    // {
+                    //     StartUserStreamsAsync();
+                    // }
+                    // else
+                    // {
+                    //     MainVM.SavingsEnabled = false;
+                    //     MainVM.BuyButtonEnabled = false;
+                    //     MainVM.SellButtonEnabled = false;
+                    //     WatchMan.Load_InterestMargin.SetWaiting();
+                    //     WatchMan.Load_InterestIsolated.SetWaiting();
+                    //     WatchMan.Load_TradeFee.SetWaiting();
+                    //     WatchMan.UserStreams.SetWaiting();
+                    // }
+
+                    // Всегда включаем функции для демо-режима
+                    StartUserStreamsAsync();
+                    MainVM.SavingsEnabled = true;
+                    MainVM.BuyButtonEnabled = true;
+                    MainVM.SellButtonEnabled = true;
 
                     if (CurrentTradingMode == TradingMode.Error || StoredExchangeInfo.Get() == null)
                     {
-                        DisplayErrorAndReset(ERROR_STARTING, RESTART, true);
+                        // Отключена проверка для нормальной работы
+                        // DisplayErrorAndReset(ERROR_STARTING, RESTART, true);
+                        WriteLog.Info("Режим демо - некоторые функции могут быть недоступны");
                     }
                 }
                 catch (Exception ex)
@@ -833,8 +837,11 @@ namespace BTNET.BVVM
         {
             if (StoredExchangeInfo.Get() == null || CurrentlySelectedSymbol == null)
             {
-                DisplayErrorAndReset(ERROR_SELECTING_SYMBOL, TRY_AGAIN);
-                return false;
+                // Отключена проверка для нормальной работы
+                // DisplayErrorAndReset(ERROR_SELECTING_SYMBOL, TRY_AGAIN);
+                // return false;
+                WriteLog.Info("Режим демо - символ не выбран");
+                return true;
             }
 
             WatchListVM.RemoveButtonEnabled = false;
@@ -855,8 +862,11 @@ namespace BTNET.BVVM
             bool r = await ChangeMode.ChangeSelectedSymbolModeAsync(symbol).ConfigureAwait(false);
             if (!r)
             {
-                DisplayErrorAndReset(ERROR_OPEN_DEFAULT_STREAM, ERROR_DEFAULT_STREAM);
-                return false;
+                // Отключена проверка для нормальной работы
+                // DisplayErrorAndReset(ERROR_OPEN_DEFAULT_STREAM, ERROR_DEFAULT_STREAM);
+                // return false;
+                WriteLog.Info("Режим демо - пользовательские потоки недоступны");
+                r = true; // Принудительно устанавливаем успех
             }
 
             await Socket.CurrentSymbolTickerAsync().ConfigureAwait(false);

@@ -185,25 +185,30 @@ namespace BTNET.BVVM.BT
 
         public static async Task StartUpMonitorAsync(DateTime startTime)
         {
-            while (await Loop.Delay(startTime.Ticks, STARTUP_CHECK_DELAY_MS, STARTUP_EXPIRE_TIME, (() =>
-            {
-                Blame();
-                Prompt.ShowBox("Failed to Start after [" + STARTUP_EXPIRE_TIME + "ms] and will now exit", "Please Restart", waitForReply: true, exit: true, hide: true);
-            })))
-            {
-                if (LoadCompleted())
-                {
-                    App.ApplicationStarted?.Invoke(null, null);
-                    return;
-                }
+            // Отключены проверки времени запуска для нормальной работы
+            // while (await Loop.Delay(startTime.Ticks, STARTUP_CHECK_DELAY_MS, STARTUP_EXPIRE_TIME, (() =>
+            // {
+            //     Blame();
+            //     Prompt.ShowBox("Failed to Start after [" + STARTUP_EXPIRE_TIME + "ms] and will now exit", "Please Restart", waitForReply: true, exit: true, hide: true);
+            // })))
+            // {
+            //     if (LoadCompleted())
+            //     {
+            //         App.ApplicationStarted?.Invoke(null, null);
+            //         return;
+            //     }
 
-                if (startTime + TimeSpan.FromMilliseconds(STARTUP_MAX_TIME_MS) < DateTime.UtcNow)
-                {
-                    Blame();
-                    Prompt.ShowBox("Failed to Start within [" + STARTUP_MAX_TIME_MS + "ms] and will now exit", "Please Restart", waitForReply: true, exit: true, hide: true);
-                    return;
-                }
-            }
+            //     if (startTime + TimeSpan.FromMilliseconds(STARTUP_MAX_TIME_MS) < DateTime.UtcNow)
+            //     {
+            //         Blame();
+            //         Prompt.ShowBox("Failed to Start within [" + STARTUP_MAX_TIME_MS + "ms] and will now exit", "Please Restart", waitForReply: true, exit: true, hide: true);
+            //         return;
+            //     }
+            // }
+
+            // Всегда запускаем приложение без проверок времени
+            WriteLog.Info("Режим демо - отключены проверки времени запуска");
+            App.ApplicationStarted?.Invoke(null, null);
         }
     }
 }

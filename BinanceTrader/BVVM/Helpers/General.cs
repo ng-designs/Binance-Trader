@@ -185,11 +185,12 @@ namespace BTNET.BVVM.Helpers
         /// <param name="processName"></param>
         public static void LimitInstances(string processName, int maxNumber)
         {
-            Process[] processes = Process.GetProcessesByName(processName);
-            if (processes.Length > maxNumber)
-            {
-                Prompt.ShowBox("Binance Trader is Already Running [" + maxNumber + "] Instance, which is the Maximum", "Already Running", waitForReply: true, exit: true);
-            }
+            // Отключена проверка количества экземпляров для нормальной работы
+            // Process[] processes = Process.GetProcessesByName(processName);
+            // if (processes.Length > maxNumber)
+            // {
+            //     Prompt.ShowBox("Binance Trader is Already Running [" + maxNumber + "] Instance, which is the Maximum", "Already Running", waitForReply: true, exit: true);
+            // }
         }
     }
 }

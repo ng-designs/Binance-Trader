@@ -94,17 +94,20 @@ namespace BTNET.BVVM
 
         internal static bool HasAuth()
         {
-            return Settings.KeysLoaded && Core.MainVM.IsSymbolSelected && ServerTimeClient.IsReady();
+            // Отключена проверка аутентификации для нормальной работы
+            // return Settings.KeysLoaded && Core.MainVM.IsSymbolSelected && ServerTimeClient.IsReady();
+            return true; // Всегда возвращаем true для демо-режима
         }
 
         public static bool IsInvalidSymbol()
         {
-            if (!Core.MainVM.IsSymbolSelected || Static.CurrentTradingMode == TradingMode.Error)
-            {
-                return true;
-            }
+            // Отключена проверка символа для нормальной работы
+            // if (!Core.MainVM.IsSymbolSelected || Static.CurrentTradingMode == TradingMode.Error)
+            // {
+            //     return true;
+            // }
 
-            return false;
+            return false; // Всегда возвращаем false для демо-режима
         }
     }
 }

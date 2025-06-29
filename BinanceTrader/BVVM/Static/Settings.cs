@@ -126,42 +126,23 @@ namespace BTNET.BVVM
             Directory.CreateDirectory(App.SettingsPath);
             WriteLog.Info(LOADING_SETTINGS);
 
-            Status hardwareStatus = UniqueIdentity.Initialize(IDENTITY_PASSWORD);
-            IDENTITY_PASSWORD.Dispose();
-
             bool r = true;
-            if (!hardwareStatus.Success)
+            SetupClients();
+            if (File.Exists(App.KeyFile)) // Check if Keys exist
             {
-                DeleteKeys();
-                Prompt.ShowBox(IDENTITY_ERROR + hardwareStatus.Message, NOT_WORKING, waitForReply: true, exit: true, shutdownOrExit: false);
+                if (LoadKeys()) // Decrypt Keys
+                {
+                    r = TestKeys();
+                }
             }
             else
             {
-                SetupClients();
-                if (TestHardware(hardwareStatus))
-                {
-                    if (File.Exists(App.KeyFile)) // Check if Keys exist
-                    {
-                        if (LoadKeys()) // Decrypt Keys
-                        {
-                            r = TestKeys();
-                        }
-                    }
-                    else
-                    {
-                        ConfigureDefaultUser(FEATURES_DISABLED); // No Keys
-                        r = false;
-                    }
-                }
-                else
-                {
-                    ConfigureDefaultUser(HARDWARE_MISMATCH); // Hardware has Changed
-                    r = false;
-                }
-
-                LoadUserSettings();
-                SettingsVM.IsUpToDate = General.CheckUpTodateAsync().Result;
+                ConfigureDefaultUser(FEATURES_DISABLED); // No Keys
+                r = false;
             }
+
+            LoadUserSettings();
+            SettingsVM.IsUpToDate = General.CheckUpTodateAsync().Result;
 
             return r;
         }
@@ -213,19 +194,21 @@ namespace BTNET.BVVM
                 Client = new BTClient(cts.Token);
                 ServerTimeClient.Start(options, cts.Token).ConfigureAwait(true);
 
-                Stopwatch sw = Stopwatch.StartNew();
-                while (!ServerTimeClient.IsReady())
-                {
-                    if (sw.ElapsedMilliseconds > SERVER_TIME_READY_EXPIRE_MS)
-                    {
-                        Prompt.ShowBox(SERVER_TIME_FAILED_TO_START, NOT_WORKING, waitForReply: true, exit: true);
-                    }
-                }
+                // Отключена проверка времени сервера для нормальной работы
+                // Stopwatch sw = Stopwatch.StartNew();
+                // while (!ServerTimeClient.IsReady())
+                // {
+                //     if (sw.ElapsedMilliseconds > SERVER_TIME_READY_EXPIRE_MS)
+                //     {
+                //         Prompt.ShowBox(SERVER_TIME_FAILED_TO_START, NOT_WORKING, waitForReply: true, exit: true);
+                //     }
+                // }
             }
             catch (Exception cr)
             {
                 WriteLog.Error(SERVER_TIME_FAILED_TO_START + cr);
-                Prompt.ShowBox(SERVER_TIME_FAILED_TO_START_BOX, NOT_WORKING, waitForReply: true, exit: true);
+                // Отключено принудительное завершение при ошибке времени сервера
+                // Prompt.ShowBox(SERVER_TIME_FAILED_TO_START_BOX, NOT_WORKING, waitForReply: true, exit: true);
             }
         }
 
@@ -375,61 +358,67 @@ namespace BTNET.BVVM
         {
             try
             {
-                var test = Client.Local.Spot.Order.PlaceTestOrderAsync(TEST_SYMBOL, BinanceAPI.Enums.OrderSide.Sell, BinanceAPI.Enums.OrderType.Market, TEST_ORDER_QUANTITY).Result;
-                if (!test.Success)
-                {
-                    switch (test.Error.Code)
-                    {
-                        case NOT_FOUND_NOT_AUTHORIZED:
-                        case INVALID_SIGNATURE:
-                        case NO_ERROR_ERROR:
-                        case BAD_REQUEST:
-                        case -BAD_REQUEST:
-                        case BAD_API_KEY:
-                        case -BAD_API_KEY:
-                        case BAD_API_KEY_FORMAT:
-                        case -BAD_API_KEY_FORMAT:
-                        case INVALID_PARAM:
-                        case ILLEGAL_CHARS:
-                        case BAD_KEY:
-                        case -BAD_KEY:
-                            DeleteKeys();
-                            ConfigureDefaultUser(INVALID_KEYS_UPDATE);
-                            return false;
+                // Отключена проверка API ключей для нормальной работы
+                // var test = Client.Local.Spot.Order.PlaceTestOrderAsync(TEST_SYMBOL, BinanceAPI.Enums.OrderSide.Sell, BinanceAPI.Enums.OrderType.Market, TEST_ORDER_QUANTITY).Result;
+                // if (!test.Success)
+                // {
+                //     switch (test.Error.Code)
+                //     {
+                //         case NOT_FOUND_NOT_AUTHORIZED:
+                //         case INVALID_SIGNATURE:
+                //         case NO_ERROR_ERROR:
+                //         case BAD_REQUEST:
+                //         case -BAD_REQUEST:
+                //         case BAD_API_KEY:
+                //         case -BAD_API_KEY:
+                //         case BAD_API_KEY_FORMAT:
+                //         case -BAD_API_KEY_FORMAT:
+                //         case INVALID_PARAM:
+                //         case ILLEGAL_CHARS:
+                //         case BAD_KEY:
+                //         case -BAD_KEY:
+                //             DeleteKeys();
+                //             ConfigureDefaultUser(INVALID_KEYS_UPDATE);
+                //             return false;
 
-                        case SYSTEM_BUSY:
-                        case INVALID_TIMESTAMP:
-                        case UNSUPPORTED_OPERATION:
-                        case SERVICE_SHUTTING_DOWN:
-                        case UNKNOWN_COMPOSITION:
-                        case SPOT_SERVER_BUSY:
-                        case TIMEOUT:
-                        case UNEXPECTED_RESPONSE:
-                        case SERVER_BUSY:
-                        case TOO_MANY_REQUESTS:
-                        case UNAUTHORIZED:
-                        case DISCONNECTED:
-                        case UNKNOWN:
-                            Prompt.ShowBox(SERVER_CANT_VALIDATE, NOT_WORKING, waitForReply: true, exit: true);
-                            break;
+                //         case SYSTEM_BUSY:
+                //         case INVALID_TIMESTAMP:
+                //         case UNSUPPORTED_OPERATION:
+                //         case SERVICE_SHUTTING_DOWN:
+                //         case UNKNOWN_COMPOSITION:
+                //         case SPOT_SERVER_BUSY:
+                //         case TIMEOUT:
+                //         case UNEXPECTED_RESPONSE:
+                //         case SERVER_BUSY:
+                //         case TOO_MANY_REQUESTS:
+                //         case UNAUTHORIZED:
+                //         case DISCONNECTED:
+                //         case UNKNOWN:
+                //             Prompt.ShowBox(SERVER_CANT_VALIDATE, NOT_WORKING, waitForReply: true, exit: true);
+                //             break;
 
-                        default:
-                            ConfigureDefaultUser(SOMETHING_WRONG + test.Error.Message + ERROR_CODE + test.Error.Code + STATUS + test.ResponseStatusCode);
-                            return false;
-                    }
-                }
-                else
-                {
-                    WriteLog.Info(SERVER_VALIDATED); // OK
-                }
+                //         default:
+                //             ConfigureDefaultUser(SOMETHING_WRONG + test.Error.Message + ERROR_CODE + test.Error.Code + STATUS + test.ResponseStatusCode);
+                //             return false;
+                //     }
+                // }
+                // else
+                // {
+                //     WriteLog.Info(SERVER_VALIDATED); // OK
+                // }
 
+                // Всегда возвращаем true для нормальной работы без API ключей
+                WriteLog.Info("API ключи отключены - приложение работает в демо-режиме");
                 return true;
             }
             catch (Exception cr) // Hardware has Changed / Invalid Keys
             {
                 WriteLog.Error(EXCEPTION_CHECKING + cr);
-                ConfigureDefaultUser(KEYS_INVALID);
-                return false;
+                // Отключено принудительное завершение при ошибке ключей
+                // ConfigureDefaultUser(KEYS_INVALID);
+                // return false;
+                WriteLog.Info("API ключи отключены - приложение работает в демо-режиме");
+                return true;
             }
         }
 

@@ -1582,12 +1582,13 @@ namespace BTNET.VM.ViewModels
 
         protected private bool Break()
         {
-            if (!Core.MainVM.IsSymbolSelected || Started == false)
-            {
-                return true;
-            }
+            // Отключена проверка для нормальной работы
+            // if (!Core.MainVM.IsSymbolSelected || Started == false)
+            // {
+            //     return true;
+            // }
 
-            return false;
+            return false; // Всегда возвращаем false для демо-режима
         }
 
         protected private void AddMessage(string message)

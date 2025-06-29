@@ -550,7 +550,8 @@ namespace BTNET.VM.ViewModels
 
         internal void Enable()
         {
-            Settings.KeysLoaded = false;
+            // Отключена проверка для нормальной работы
+            // Settings.KeysLoaded = false;
             ApiKey = string.Empty;
             ApiSecret = string.Empty;
             ApiKeyEnabled = true;
@@ -561,7 +562,8 @@ namespace BTNET.VM.ViewModels
 
         internal void Disable()
         {
-            Settings.KeysLoaded = true;
+            // Отключена проверка для нормальной работы
+            // Settings.KeysLoaded = true;
             ApiKeyEnabled = false;
             ApiSecretEnabled = false;
             SaveEnabled = false;

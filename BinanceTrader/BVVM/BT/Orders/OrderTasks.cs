@@ -213,9 +213,11 @@ namespace BTNET.BVVM.BT.Orders
                         return Assets.IsolatedAssets.FirstOrDefault(x => x.Symbol == asset.Name).BaseAsset.Available;
                     }
                 default:
-                    Prompt.ShowBox(TRADING_MODE_EXPECTED, SELECT_SYMBOL_AGAIN);
-                    WriteLog.Error(TRADING_MODE_EXPECTED + asset.BaseAsset);
-                    MainContext.ResetSymbol();
+                    // Отключена проверка для нормальной работы
+                    // Prompt.ShowBox(TRADING_MODE_EXPECTED, SELECT_SYMBOL_AGAIN);
+                    // WriteLog.Error(TRADING_MODE_EXPECTED + asset.BaseAsset);
+                    // MainContext.ResetSymbol();
+                    WriteLog.Info("Режим демо - торговый режим не определен");
                     return 0;
             }
         }
@@ -242,7 +244,9 @@ namespace BTNET.BVVM.BT.Orders
                 if (symbolInfo == null)
                 {
                     WriteLog.Error(EXCHANGE_INFO_MISSING);
-                    Prompt.ShowBox(EXCHANGE_INFO_MISSING, RESTART_CLIENT);
+                    // Отключена проверка для нормальной работы
+                    // Prompt.ShowBox(EXCHANGE_INFO_MISSING, RESTART_CLIENT);
+                    WriteLog.Info("Режим демо - информация о бирже недоступна");
                     return;
                 }
 

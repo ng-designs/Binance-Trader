@@ -320,8 +320,9 @@ namespace BTNET.BVVM
 
         public Task UpdateTradeFeeAsync()
         {
-            if ((MainVM.IsSymbolSelected && Static.HasAuth()))
-            {
+            // Отключена проверка аутентификации для нормальной работы
+            // if ((MainVM.IsSymbolSelected && Static.HasAuth()))
+            // {
                 _currentTradeFee = TradeFee.GetTradeFee(Static.SelectedSymbolViewModel.SymbolView.Symbol);
                 Static.SelectedSymbolViewModel.TradeFee = _currentTradeFee;
 
@@ -342,18 +343,19 @@ namespace BTNET.BVVM
                             + MAKER + _currentTradeFee.MakerFee + UGH3 + (_currentTradeFee.MakerFee * ONE_HUNDRED) + UGH);
                     }
                 }
-            }
+            // }
 
             return Task.CompletedTask;
         }
 
         public Task UpdateInterestRateCurrentSymbolAsync()
         {
-            if ((MainVM.IsSymbolSelected && Static.HasAuth()))
-            {
+            // Отключена проверка аутентификации для нормальной работы
+            // if ((MainVM.IsSymbolSelected && Static.HasAuth()))
+            // {
                 _currentInterestRate = InterestRate.GetDailyInterestRate(Static.SelectedSymbolViewModel.SymbolView.Symbol);
                 Static.SelectedSymbolViewModel.InterestRate = _currentInterestRate;
-            }
+            // }
 
             return Task.CompletedTask;
         }
