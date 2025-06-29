@@ -1,210 +1,40 @@
-name: Build and Release
+name: Build Binance Trader
 
 on:
   push:
-    branches: [ main, master, develop ]
-    tags: [ 'v*' ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
-env:
-  MSBUILD_VERSION: '17.0'
-  SOLUTION_FILE: 'Binance Trader.sln'
-  PROJECT_NAME: 'Binance Trader'
-  ARTIFACT_NAME: 'binance-trader'
-
 jobs:
   build:
-    name: Build Binance Trader
     runs-on: windows-latest
-    
-    strategy:
-      matrix:
-        configuration: [Release, Debug]
-        platform: [x64, x86, AnyCPU]
-        exclude:
-          - configuration: Debug
-            platform: x86
-          - configuration: Debug
-            platform: AnyCPU
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.3
-      with:
-        version: ${{ env.MSBUILD_VERSION }}
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3
 
-    - name: Install .NET Framework 4.8 SDK
-      run: |
-        # Install .NET Framework 4.8 SDK
-        choco install dotnetfx --version=4.8.0.20190930 -y
+      - name: Install .NET Framework 4.8 SDK
+        run: choco install dotnetfx --version=4.8.0.20190930 -y
 
-    - name: Restore NuGet packages
-      run: |
-        nuget restore "${{ env.SOLUTION_FILE }}"
+      - name: Restore NuGet packages
+        run: nuget restore "Binance Trader.sln"
 
-    - name: Build solution
-      run: |
-        msbuild "${{ env.SOLUTION_FILE }}" /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /p:RestorePackages=false /verbosity:minimal
+      - name: Build solution
+        run: |
+          msbuild "Binance Trader.sln" /p:Configuration=Release /p:Platform=x64 /p:RestorePackages=false /verbosity:minimal
 
-    - name: Create build artifacts
-      run: |
-        $buildPath = "BinanceTrader\bin\${{ matrix.configuration }}\${{ matrix.platform }}"
-        if (Test-Path $buildPath) {
-          $artifactName = "${{ env.ARTIFACT_NAME }}-${{ matrix.configuration }}-${{ matrix.platform }}"
-          Compress-Archive -Path "$buildPath\*" -DestinationPath "$artifactName.zip" -Force
-        }
+      - name: Archive build output
+        run: |
+          $buildPath = "BinanceTrader\bin\Release\x64"
+          $artifactName = "binance-trader-Release-x64.zip"
+          Compress-Archive -Path "$buildPath\*" -DestinationPath "$artifactName" -Force
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.ARTIFACT_NAME }}-${{ matrix.configuration }}-${{ matrix.platform }}
-        path: ${{ env.ARTIFACT_NAME }}-${{ matrix.configuration }}-${{ matrix.platform }}.zip
-        retention-days: 30
-
-  test:
-    name: Run Tests
-    runs-on: windows-latest
-    needs: build
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.3
-
-    - name: Install .NET Framework 4.8 SDK
-      run: |
-        choco install dotnetfx --version=4.8.0.20190930 -y
-
-    - name: Run tests
-      run: |
-        # Run tests if any test projects exist
-        Get-ChildItem -Recurse -Filter "*.csproj" | Where-Object { $_.Name -like "*Test*" -or $_.Name -like "*Tests*" } | ForEach-Object {
-          Write-Host "Running tests in $($_.Name)"
-          msbuild $_.FullName /p:Configuration=Release /p:Platform=x64
-        }
-      continue-on-error: true
-
-  package:
-    name: Create Release Package
-    runs-on: windows-latest
-    needs: [build, test]
-    if: startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
-
-    - name: Create release package
-      run: |
-        $releaseDir = "release-package"
-        New-Item -ItemType Directory -Path $releaseDir -Force
-        
-        # Copy Release x64 build as main release
-        $mainBuild = "artifacts/${{ env.ARTIFACT_NAME }}-Release-x64"
-        if (Test-Path $mainBuild) {
-          Copy-Item -Path "$mainBuild\*" -Destination $releaseDir -Recurse -Force
-        }
-        
-        # Create portable version
-        $portableDir = "$releaseDir-portable"
-        New-Item -ItemType Directory -Path $portableDir -Force
-        if (Test-Path $mainBuild) {
-          Copy-Item -Path "$mainBuild\*" -Destination $portableDir -Recurse -Force
-        }
-        
-        # Create installers
-        $installerDir = "$releaseDir-installer"
-        New-Item -ItemType Directory -Path $installerDir -Force
-        
-        # Copy all builds to installer directory
-        Get-ChildItem -Path "artifacts" -Directory | ForEach-Object {
-          $buildName = $_.Name
-          $buildPath = $_.FullName
-          $targetPath = "$installerDir\$buildName"
-          New-Item -ItemType Directory -Path $targetPath -Force
-          Copy-Item -Path "$buildPath\*" -Destination $targetPath -Recurse -Force
-        }
-
-    - name: Upload release package
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-package
-        path: |
-          release-package/
-          release-package-portable/
-          release-package-installer/
-        retention-days: 90
-
-  release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    needs: [build, test, package]
-    if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: write
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Download release package
-      uses: actions/download-artifact@v4
-      with:
-        name: release-package
-        path: release-package
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          release-package/**/*.zip
-          release-package/**/*.exe
-        draft: false
-        prerelease: false
-        generate_release_notes: true
-        title: Release ${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Run CodeQL Analysis
-      uses: github/codeql-action/init@v3
-      with:
-        languages: csharp
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif' 
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binance-trader-Release-x64
+          path: binance-trader-Release-x64.zip
+          retention-days: 30 
