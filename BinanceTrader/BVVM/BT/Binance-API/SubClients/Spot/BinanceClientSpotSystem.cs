@@ -72,7 +72,7 @@ namespace BinanceAPI.SubClients.Spot
         public async Task<WebCallResult<long>> PingAsync(CancellationToken ct = default)
         {
             Pong.Restart();
-            var result = await _baseClient.SendRequestInternal<object>(UriClient.GetBaseAddress() + GetUriString.Combine(pingEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
+            var result = await _baseClient.SendRequestInternal<object>(UriClient.GetBaseAddress() + GetUriString.Combine(pingEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
             Pong.Stop();
             return result.As(Pong.ElapsedMilliseconds);
         }
@@ -90,7 +90,7 @@ namespace BinanceAPI.SubClients.Spot
         public async Task<WebCallResult<DateTime>> GetServerTimeAsync(bool resetAutoTimestamp = false, CancellationToken ct = default)
         {
             var url = UriClient.GetBaseAddress() + GetUriString.Combine("time", api, publicVersion);
-            var result = await _baseClient.SendRequestInternal<BinanceCheckTime>(url, HttpMethod.Get, ct).ConfigureAwait(false);
+            var result = await _baseClient.SendRequestInternal<BinanceCheckTime>(url, HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
             if (result)
             {
                 if (resetAutoTimestamp)

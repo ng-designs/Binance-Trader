@@ -36,6 +36,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -221,7 +222,7 @@ namespace BinanceAPI.SubClients.Spot
         /// <returns>24hr ticker for all symbols</returns>
         public async Task<WebCallResult<IEnumerable<Binance24HPrice>>> GetTickers24HAsync(CancellationToken ct = default)
         {
-            return await _baseClient.SendRequestInternal<IEnumerable<Binance24HPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(price24HEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
+            return await _baseClient.SendRequestInternal<IEnumerable<Binance24HPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(price24HEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
         }
 
         #endregion 24hr ticker
@@ -251,7 +252,7 @@ namespace BinanceAPI.SubClients.Spot
         /// <returns>List of prices</returns>
         public async Task<WebCallResult<IEnumerable<BinancePrice>>> GetTickerPricesAsync(CancellationToken ct = default)
         {
-            return await _baseClient.SendRequestInternal<IEnumerable<BinancePrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(allPricesEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
+            return await _baseClient.SendRequestInternal<IEnumerable<BinancePrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(allPricesEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
         }
 
         #endregion Symbol price ticker
@@ -281,7 +282,7 @@ namespace BinanceAPI.SubClients.Spot
         /// <returns>List of book prices</returns>
         public async Task<WebCallResult<IEnumerable<BinanceBookPrice>>> GetTickerBookPricesAsync(CancellationToken ct = default)
         {
-            return await _baseClient.SendRequestInternal<IEnumerable<BinanceBookPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(bookPricesEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
+            return await _baseClient.SendRequestInternal<IEnumerable<BinanceBookPrice>>(UriClient.GetBaseAddress() + GetUriString.Combine(bookPricesEndpoint, api, publicVersion), HttpMethod.Get, ct, new Dictionary<string, object>()).ConfigureAwait(false);
         }
 
         #endregion Symbol order book ticker
@@ -329,5 +330,19 @@ namespace BinanceAPI.SubClients.Spot
         }
 
         #endregion GetTradeFee
+
+        #region GetPrices
+
+        /// <summary>
+        /// Gets the price for all symbols (alias for GetTickerPricesAsync)
+        /// </summary>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>List of prices</returns>
+        public async Task<WebCallResult<IEnumerable<BinancePrice>>> GetPricesAsync(CancellationToken ct = default)
+        {
+            return await GetTickerPricesAsync(ct);
+        }
+
+        #endregion GetPrices
     }
 }

@@ -206,6 +206,15 @@ namespace BinanceAPI.ClientHosts
             return reply.Status == IPStatus.Success ? new CallResult<long>(reply.RoundtripTime, null) : new CallResult<long>(0, new CantConnectError { Message = "Ping failed: " + reply.Status });
         }
 
+        /// <summary>
+        /// Reset the auto timestamp calculation
+        /// </summary>
+        public void ResetAutoTimestamp()
+        {
+            // Reset timestamp calculation if needed
+            // This is a placeholder implementation
+        }
+
         internal async Task<WebCallResult<BinancePlacedOrder>> PlaceOrderInternalLimit(string uri,
             string symbol,
             OrderSide side,

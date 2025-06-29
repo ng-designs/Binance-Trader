@@ -30,6 +30,11 @@ namespace BinanceAPI.Enums
     public enum AccountType
     {
         /// <summary>
+        /// Unknown account type
+        /// </summary>
+        Unknown,
+
+        /// <summary>
         /// Spot account
         /// </summary>
         Spot,
@@ -67,6 +72,56 @@ namespace BinanceAPI.Enums
         /// <summary>
         /// Portfolio margin account
         /// </summary>
-        PortfolioMargin
+        PortfolioMargin,
+
+        /// <summary>
+        /// Leveraged account
+        /// </summary>
+        Leveraged,
+
+        /// <summary>
+        /// Trading group 002
+        /// </summary>
+        TRD_GRP_002,
+
+        /// <summary>
+        /// Trading group 003
+        /// </summary>
+        TRD_GRP_003,
+
+        /// <summary>
+        /// Trading group 004
+        /// </summary>
+        TRD_GRP_004,
+
+        /// <summary>
+        /// Trading group 005
+        /// </summary>
+        TRD_GRP_005,
+
+        /// <summary>
+        /// Trading group 006
+        /// </summary>
+        TRD_GRP_006,
+
+        /// <summary>
+        /// Trading group 007
+        /// </summary>
+        TRD_GRP_007,
+
+        /// <summary>
+        /// Trading group 008
+        /// </summary>
+        TRD_GRP_008,
+
+        /// <summary>
+        /// Trading group 009
+        /// </summary>
+        TRD_GRP_009,
+
+        /// <summary>
+        /// Trading group 010
+        /// </summary>
+        TRD_GRP_010
     }
 }

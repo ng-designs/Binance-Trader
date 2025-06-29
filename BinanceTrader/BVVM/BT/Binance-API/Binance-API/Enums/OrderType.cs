@@ -40,6 +40,11 @@ namespace BinanceAPI.Enums
         Market,
 
         /// <summary>
+        /// Stop order
+        /// </summary>
+        Stop,
+
+        /// <summary>
         /// Stop loss order
         /// </summary>
         StopLoss,
@@ -82,6 +87,11 @@ namespace BinanceAPI.Enums
         /// <summary>
         /// One cancels other order
         /// </summary>
-        Oco
+        Oco,
+
+        /// <summary>
+        /// Liquidation order
+        /// </summary>
+        Liquidation
     }
 }

@@ -82,6 +82,16 @@ namespace BinanceAPI.Enums
         /// <summary>
         /// Order is expired (adjustment)
         /// </summary>
-        ExpiredAdjustment
+        ExpiredAdjustment,
+
+        /// <summary>
+        /// Insurance order
+        /// </summary>
+        Insurance,
+
+        /// <summary>
+        /// ADL order
+        /// </summary>
+        Adl
     }
 }
