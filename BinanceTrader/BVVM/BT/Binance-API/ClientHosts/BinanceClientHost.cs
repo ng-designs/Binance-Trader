@@ -407,7 +407,7 @@ namespace BinanceAPI.ClientHosts
 
             Request request = RequestFactory.Create(method, uri, requestId);
 
-            request.Accept = Constants.JsonContentHeader;
+            request.Accept = BinanceAPI.Constants.Constants.JsonContentHeader;
 
             var headers = new Dictionary<string, string>();
             if (_authProvider != null)
@@ -424,7 +424,7 @@ namespace BinanceAPI.ClientHosts
 
             if (parameterPosition == HttpMethodParameterPosition.InBody)
             {
-                var contentType = Constants.FormContentHeader;
+                var contentType = BinanceAPI.Constants.Constants.FormContentHeader;
 
                 if (parameters.Any() == true)
                     WriteParamBody(request, parameters, contentType);

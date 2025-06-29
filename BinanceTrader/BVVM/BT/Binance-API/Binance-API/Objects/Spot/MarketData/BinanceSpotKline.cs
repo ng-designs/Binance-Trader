@@ -25,6 +25,7 @@
 using BinanceAPI.Converters;
 using BinanceAPI.Objects.Shared;
 using Newtonsoft.Json;
+using System;
 
 namespace BinanceAPI.Objects.Spot.MarketData
 {
@@ -34,6 +35,13 @@ namespace BinanceAPI.Objects.Spot.MarketData
     [JsonConverter(typeof(ArrayConverter))]
     public class BinanceSpotKline : BinanceKlineBase
     {
+        /// <summary>
+        /// Конструктор по умолчанию
+        /// </summary>
+        public BinanceSpotKline()
+        {
+        }
+
         /// <summary>
         /// The volume traded during this candlestick
         /// </summary>
