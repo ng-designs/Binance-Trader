@@ -65,19 +65,6 @@ namespace BinanceAPI.SubClients.Spot
         #region Test connectivity
 
         /// <summary>
-        /// Pings the Binance API
-        /// </summary>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if successful ping, false if no response</returns>
-        public async Task<WebCallResult<object>> PingAsync(CancellationToken ct = default)
-        {
-            Pong.Restart();
-            var result = await _baseClient.SendRequestInternal<object>(UriClient.GetBaseAddress() + GetUriString.Combine(pingEndpoint, api, publicVersion), HttpMethod.Get, ct).ConfigureAwait(false);
-            Pong.Stop();
-            return result;
-        }
-
-        /// <summary>
         /// Pings the Binance API and returns the round trip time
         /// </summary>
         /// <param name="ct">Cancellation token</param>
