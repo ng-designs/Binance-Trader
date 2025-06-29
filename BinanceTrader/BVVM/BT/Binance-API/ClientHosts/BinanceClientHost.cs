@@ -46,6 +46,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using static BinanceAPI.TheLog;
+using BinanceAPI.Constants;
 
 namespace BinanceAPI.ClientHosts
 {

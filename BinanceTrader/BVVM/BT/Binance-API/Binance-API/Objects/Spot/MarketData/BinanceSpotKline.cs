@@ -63,5 +63,29 @@ namespace BinanceAPI.Objects.Spot.MarketData
         /// </summary>
         [ArrayProperty(11)]
         public decimal? Ignore { get; set; }
+
+        /// <summary>
+        /// Конструктор для object[]
+        /// </summary>
+        public BinanceSpotKline(object[] values)
+        {
+            if (values == null || values.Length < 12)
+                return;
+            // Если базовый класс поддерживает инициализацию через object[], вызвать его конструктор
+            // иначе инициализировать свойства вручную
+            // Пример:
+            if (values.Length > 0 && values[0] != null) OpenTime = Convert.ToInt64(values[0]);
+            if (values.Length > 1 && values[1] != null) Open = Convert.ToDecimal(values[1]);
+            if (values.Length > 2 && values[2] != null) High = Convert.ToDecimal(values[2]);
+            if (values.Length > 3 && values[3] != null) Low = Convert.ToDecimal(values[3]);
+            if (values.Length > 4 && values[4] != null) Close = Convert.ToDecimal(values[4]);
+            if (values.Length > 5 && values[5] != null) BaseVolume = Convert.ToDecimal(values[5]);
+            if (values.Length > 6 && values[6] != null) CloseTime = Convert.ToInt64(values[6]);
+            if (values.Length > 7 && values[7] != null) QuoteVolume = Convert.ToDecimal(values[7]);
+            if (values.Length > 8 && values[8] != null) TradeCount = Convert.ToInt32(values[8]);
+            if (values.Length > 9 && values[9] != null) TakerBuyBaseVolume = Convert.ToDecimal(values[9]);
+            if (values.Length > 10 && values[10] != null) TakerBuyQuoteVolume = Convert.ToDecimal(values[10]);
+            if (values.Length > 11 && values[11] != null) Ignore = Convert.ToDecimal(values[11]);
+        }
     }
 }
