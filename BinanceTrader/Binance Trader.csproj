@@ -148,7 +148,7 @@
 
 	<PropertyGroup>
 		<MSVCPath>C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Redist\\MSVC\\14.34.31931\\x64\\Microsoft.VC143.CRT\\</MSVCPath>
-		<CopyVC>true</CopyVC>
+		<CopyVC>false</CopyVC>
 	</PropertyGroup>
 
 	<Target Name="CopyRedistributables" AfterTargets="Build" Condition="'$(Configuration)'=='RELEASE' and '$(CopyVC)'=='true'">
